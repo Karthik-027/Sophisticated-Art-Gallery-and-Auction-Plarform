@@ -53,8 +53,21 @@ public class ArtistService {
         return artistRepository.findByBioContaining(keyword);
     }
 
-    // Delete artists by name
+    // Delete artists by name (case-insensitive)
     public void deleteArtistsByName(String name) {
         artistRepository.deleteByName(name);
+    }
+
+    // Update an artist's email by name
+    public boolean updateEmailByName(String name, String newEmail) {
+        List<Artist> artists = artistRepository.findByNameIgnoreCase(name);
+        if (!artists.isEmpty()) {
+            for (Artist artist : artists) {
+                artist.setEmail(newEmail);
+                artistRepository.save(artist);  // Save updated artist to the repository
+            }
+            return true;
+        }
+        return false;  // Return false if no artist with the given name is found
     }
 }

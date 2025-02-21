@@ -4,7 +4,6 @@ import artgallery.project.model.Artist;
 import artgallery.project.service.ArtistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-// import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -66,15 +65,14 @@ public class ArtistController {
     // Get paginated and sorted list of artists
     @GetMapping("/paginated")
     public ResponseEntity<List<Artist>> getPaginatedArtists(
-    @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "10") int size,
-    @RequestParam(defaultValue = "name") String sortBy,
-    @RequestParam(defaultValue = "asc") String direction
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "name") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction
     ) {
-    List<Artist> artists = artistService.getPaginatedArtists(page, size, sortBy, direction).getContent();
-    return new ResponseEntity<>(artists, HttpStatus.OK);
+        List<Artist> artists = artistService.getPaginatedArtists(page, size, sortBy, direction).getContent();
+        return new ResponseEntity<>(artists, HttpStatus.OK);
     }   
-
 
     // Find artists by name
     @GetMapping("/search")
@@ -93,5 +91,16 @@ public class ArtistController {
     public ResponseEntity<Void> deleteArtistByName(@RequestParam String name) {
         artistService.deleteArtistsByName(name);
         return ResponseEntity.noContent().build();
+    }
+
+    // Update artist email by name
+    @PutMapping("/updateEmail")
+    public ResponseEntity<Void> updateArtistEmail(@RequestParam("name") String name, @RequestParam("newEmail") String newEmail) {
+        boolean isUpdated = artistService.updateEmailByName(name, newEmail);
+        if (isUpdated) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

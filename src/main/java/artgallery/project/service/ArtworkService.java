@@ -39,6 +39,28 @@ public class ArtworkService {
         artworkRepository.deleteById(id);
     }
 
+    // JPQL: Update artwork by ID
+    public Artwork updateArtworkById(Long id, Artwork updatedArtwork) {
+        int rowsAffected = artworkRepository.updateArtworkById(
+            id,
+            updatedArtwork.getTitle(),
+            updatedArtwork.getDescription(),
+            updatedArtwork.getPrice(),
+            updatedArtwork.getArtistId()
+        );
+        
+        if (rowsAffected == 0) {
+            throw new IllegalArgumentException("Artwork with ID " + id + " not found.");
+        }
+
+        return updatedArtwork;
+    }
+
+    // JPQL: Delete artwork by ID
+    public void deleteArtworkUsingQuery(Long id) {
+        artworkRepository.deleteArtworkById(id);
+    }
+
     // Get paginated artworks
     public Page<Artwork> getPaginatedArtworks(int page, int size) {
         return artworkRepository.findAll(PageRequest.of(page, size));
@@ -58,5 +80,4 @@ public class ArtworkService {
     public List<Artwork> findArtworksByPriceRange(double minPrice, double maxPrice) {
         return artworkRepository.findArtworksByPriceRange(minPrice, maxPrice);
     }
-    
 }
