@@ -34,49 +34,67 @@ public class ArtworkService {
         return artworkRepository.save(artwork);
     }
 
-    // Delete artwork by ID
-    public void deleteArtworkById(Long id) {
-        artworkRepository.deleteById(id);
+    // Update artwork by ID
+    public Artwork updateArtworkById(Long id, Artwork updatedArtwork) {
+        return artworkRepository.findById(id).map(existingArtwork -> {
+            existingArtwork.setTitle(updatedArtwork.getTitle());
+            existingArtwork.setDescription(updatedArtwork.getDescription());
+            existingArtwork.setPrice(updatedArtwork.getPrice());
+            existingArtwork.setArtistId(updatedArtwork.getArtistId());
+            return artworkRepository.save(existingArtwork);
+        }).orElseThrow(() -> new IllegalArgumentException("Artwork with ID " + id + " not found."));
     }
 
-    // JPQL: Update artwork by ID
-    public Artwork updateArtworkById(Long id, Artwork updatedArtwork) {
-        int rowsAffected = artworkRepository.updateArtworkById(
-            id,
-            updatedArtwork.getTitle(),
-            updatedArtwork.getDescription(),
-            updatedArtwork.getPrice(),
-            updatedArtwork.getArtistId()
-        );
-        
+    // Delete artwork by ID
+    public boolean deleteArtworkById(Long id) {
+        if (artworkRepository.existsById(id)) {
+            artworkRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    // Existing update and delete operations
+    public void deleteArtworkByTitle(String title) {
+        artworkRepository.deleteArtworkByTitle(title);
+    }
+
+    public void deleteArtworkByDescription(String description) {
+        artworkRepository.deleteArtworkByDescription(description);
+    }
+
+    public Artwork updateArtworkByTitle(String title, Artwork updatedArtwork) {
+        int rowsAffected = artworkRepository.updateArtworkByTitle(title, updatedArtwork.getDescription(), updatedArtwork.getPrice(), updatedArtwork.getArtistId());
+
         if (rowsAffected == 0) {
-            throw new IllegalArgumentException("Artwork with ID " + id + " not found.");
+            throw new IllegalArgumentException("Artwork with title '" + title + "' not found.");
         }
 
         return updatedArtwork;
     }
 
-    // JPQL: Delete artwork by ID
-    public void deleteArtworkUsingQuery(Long id) {
-        artworkRepository.deleteArtworkById(id);
+    public Artwork updateArtworkByDescription(String description, Artwork updatedArtwork) {
+        int rowsAffected = artworkRepository.updateArtworkByDescription(description, updatedArtwork.getTitle(), updatedArtwork.getPrice(), updatedArtwork.getArtistId());
+
+        if (rowsAffected == 0) {
+            throw new IllegalArgumentException("Artwork with description '" + description + "' not found.");
+        }
+
+        return updatedArtwork;
     }
 
-    // Get paginated artworks
     public Page<Artwork> getPaginatedArtworks(int page, int size) {
         return artworkRepository.findAll(PageRequest.of(page, size));
     }
 
-    // JPQL: Find artworks by title
     public List<Artwork> findArtworksByTitle(String title) {
         return artworkRepository.findArtworksByTitle(title);
     }
 
-    // JPQL: Find artworks by artist ID
     public List<Artwork> findArtworksByArtistId(Long artistId) {
         return artworkRepository.findArtworksByArtistId(artistId);
     }
 
-    // JPQL: Find artworks within a price range
     public List<Artwork> findArtworksByPriceRange(double minPrice, double maxPrice) {
         return artworkRepository.findArtworksByPriceRange(minPrice, maxPrice);
     }

@@ -39,65 +39,84 @@ public class ArtworkController {
             Artwork createdArtwork = artworkService.createOrUpdateArtwork(artwork);
             return new ResponseEntity<>(createdArtwork, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);  // Handle missing or invalid artist
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);  
         }
     }
 
-    // Update artwork
+    // Update artwork by ID
     @PutMapping("/{id}")
-    public ResponseEntity<Artwork> updateArtwork(@PathVariable Long id, @RequestBody Artwork artworkDetails) {
-        if (!artworkService.getArtworkById(id).isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        artworkDetails.setId(id);  // Ensure the artwork ID is correctly set
+    public ResponseEntity<Artwork> updateArtworkById(@PathVariable Long id, @RequestBody Artwork artworkDetails) {
         try {
-            Artwork updatedArtwork = artworkService.createOrUpdateArtwork(artworkDetails);
+            Artwork updatedArtwork = artworkService.updateArtworkById(id, artworkDetails);
             return new ResponseEntity<>(updatedArtwork, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);  // Handle missing or invalid artist
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-    // Delete artwork
+    // Delete artwork by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteArtwork(@PathVariable Long id) {
-        if (!artworkService.getArtworkById(id).isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Void> deleteArtworkById(@PathVariable Long id) {
+        if (artworkService.deleteArtworkById(id)) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        artworkService.deleteArtworkById(id);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    // Existing update and delete operations
+    @PutMapping("/updateByTitle")
+    public ResponseEntity<Artwork> updateArtworkByTitle(@RequestParam String title, @RequestBody Artwork artworkDetails) {
+        try {
+            Artwork updatedArtwork = artworkService.updateArtworkByTitle(title, artworkDetails);
+            return new ResponseEntity<>(updatedArtwork, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/updateByDescription")
+    public ResponseEntity<Artwork> updateArtworkByDescription(@RequestParam String description, @RequestBody Artwork artworkDetails) {
+        try {
+            Artwork updatedArtwork = artworkService.updateArtworkByDescription(description, artworkDetails);
+            return new ResponseEntity<>(updatedArtwork, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/deleteByTitle")
+    public ResponseEntity<Void> deleteArtworkByTitle(@RequestParam String title) {
+        artworkService.deleteArtworkByTitle(title);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/deleteByDescription")
+    public ResponseEntity<Void> deleteArtworkByDescription(@RequestParam String description) {
+        artworkService.deleteArtworkByDescription(description);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Get paginated artworks
     @GetMapping("/paginated")
-    public ResponseEntity<List<Artwork>> getPaginatedArtworks(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+    public ResponseEntity<List<Artwork>> getPaginatedArtworks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         List<Artwork> paginatedArtworks = artworkService.getPaginatedArtworks(page, size).getContent();
         return new ResponseEntity<>(paginatedArtworks, HttpStatus.OK);
     }
 
-    // Get artworks by title
     @GetMapping("/searchByTitle")
     public ResponseEntity<List<Artwork>> searchArtworksByTitle(@RequestParam String title) {
         List<Artwork> artworks = artworkService.findArtworksByTitle(title);
         return new ResponseEntity<>(artworks, HttpStatus.OK);
     }
 
-    // Get artworks by artist ID
     @GetMapping("/artist/{artistId}")
     public ResponseEntity<List<Artwork>> getArtworksByArtistId(@PathVariable Long artistId) {
         List<Artwork> artworks = artworkService.findArtworksByArtistId(artistId);
         return new ResponseEntity<>(artworks, HttpStatus.OK);
     }
 
-    // Get artworks by price range
     @GetMapping("/priceRange")
-    public ResponseEntity<List<Artwork>> getArtworksByPriceRange(
-            @RequestParam double minPrice,
-            @RequestParam double maxPrice
-    ) {
+    public ResponseEntity<List<Artwork>> getArtworksByPriceRange(@RequestParam double minPrice, @RequestParam double maxPrice) {
         List<Artwork> artworks = artworkService.findArtworksByPriceRange(minPrice, maxPrice);
         return new ResponseEntity<>(artworks, HttpStatus.OK);
     }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +35,23 @@ public class AuctionService {
     }
 
     // Delete auction by ID
+    @Transactional
     public void deleteAuctionById(Long id) {
         auctionRepository.deleteById(id);
+    }
+
+    // Delete auction by name
+    @Transactional
+    public boolean deleteAuctionByName(String name) {
+        int deletedCount = auctionRepository.deleteAuctionByName(name);
+        return deletedCount > 0;
+    }
+
+    // Delete auction by date
+    @Transactional
+    public boolean deleteAuctionByDate(String auctionDate) {
+        int deletedCount = auctionRepository.deleteAuctionByDate(auctionDate);
+        return deletedCount > 0;
     }
 
     // Get paginated auctions
@@ -48,5 +64,29 @@ public class AuctionService {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return auctionRepository.findAll(pageable);
+    }
+
+    // Find auctions by name
+    public List<Auction> findAuctionsByName(String name) {
+        return auctionRepository.findByName(name);
+    }
+
+    // Find auctions by date
+    public List<Auction> findAuctionsByDate(String date) {
+        return auctionRepository.findByDate(date);
+    }
+
+    // Update auction by name
+    @Transactional
+    public boolean updateAuctionByName(String oldName, String newDate, String newLocation) {
+        int updatedCount = auctionRepository.updateAuctionByName(oldName, newDate, newLocation);
+        return updatedCount > 0;
+    }
+
+    // Update auction by date
+    @Transactional
+    public boolean updateAuctionByDate(String auctionDate, String newName, String newLocation) {
+        int updatedCount = auctionRepository.updateAuctionByDate(auctionDate, newName, newLocation);
+        return updatedCount > 0;
     }
 }

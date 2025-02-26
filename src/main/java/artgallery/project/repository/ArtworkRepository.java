@@ -24,15 +24,27 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
     @Query("SELECT a FROM Artwork a WHERE a.price BETWEEN :minPrice AND :maxPrice")
     List<Artwork> findArtworksByPriceRange(double minPrice, double maxPrice);
 
-    // Update artwork by ID (PUT)
+    // Update artwork by title (PUT)
     @Transactional
     @Modifying
-    @Query("UPDATE Artwork a SET a.title = :title, a.description = :description, a.price = :price, a.artistId = :artistId WHERE a.id = :id")
-    int updateArtworkById(Long id, String title, String description, double price, Long artistId);
+    @Query("UPDATE Artwork a SET a.description = :description, a.price = :price, a.artistId = :artistId WHERE LOWER(a.title) = LOWER(:title)")
+    int updateArtworkByTitle(String title, String description, double price, Long artistId);
 
-    // Delete artwork by ID (DELETE)
+    // Update artwork by description (PUT)
     @Transactional
     @Modifying
-    @Query("DELETE FROM Artwork a WHERE a.id = :id")
-    void deleteArtworkById(Long id);
+    @Query("UPDATE Artwork a SET a.title = :title, a.price = :price, a.artistId = :artistId WHERE LOWER(a.description) = LOWER(:description)")
+    int updateArtworkByDescription(String description, String title, double price, Long artistId);
+
+    // Delete artwork by title (DELETE)
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Artwork a WHERE LOWER(a.title) = LOWER(:title)")
+    void deleteArtworkByTitle(String title);
+
+    // Delete artwork by description (DELETE)
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Artwork a WHERE LOWER(a.description) = LOWER(:description)")
+    void deleteArtworkByDescription(String description);
 }

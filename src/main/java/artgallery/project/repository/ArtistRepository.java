@@ -26,21 +26,9 @@ public interface ArtistRepository extends JpaRepository<Artist, Long> {
     @Query("DELETE FROM Artist a WHERE LOWER(a.name) = LOWER(?1)")
     void deleteByName(String name);
 
-    // 4. Add (POST) a new artist (handled by JpaRepository's save method)
-
-    // 5. Find all artists (GET all)
-    @Query("SELECT a FROM Artist a")
-    List<Artist> findAllArtists();
-
     // 6. Find an artist by email (case-insensitive)
     @Query("SELECT a FROM Artist a WHERE LOWER(a.email) = LOWER(?1)")
     Artist findByEmailIgnoreCase(String email);
-
-    // 7. Update artist's bio (PUT)
-    @Modifying
-    @Transactional
-    @Query("UPDATE Artist a SET a.bio = ?2 WHERE LOWER(a.name) = LOWER(?1)")
-    void updateBioByName(String name, String newBio);
 
     // 8. Update artist's email (PUT)
     @Modifying
