@@ -1,5 +1,7 @@
 package artgallery.project.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -11,17 +13,21 @@ public class Artwork {
     private String title;
     private String description;
     private double price;
-    private Long artistId;  // Store artist's ID as a reference instead of mapping
+    
+    @ManyToOne
+    @JoinColumn(name = "artist_id", nullable = false)
+    @JsonBackReference
+    private Artist artist; // Establishing the relationship with Artist
 
     // Default constructor
     public Artwork() {}
 
-    public Artwork(Long id, String title, String description, double price, Long artistId) {
+    public Artwork(Long id, String title, String description, double price, Artist artist) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.price = price;
-        this.artistId = artistId;
+        this.artist = artist;
     }
 
     // Getters and Setters
@@ -57,11 +63,11 @@ public class Artwork {
         this.price = price;
     }
 
-    public Long getArtistId() {
-        return artistId;
+    public Artist getArtist() {
+        return artist;
     }
 
-    public void setArtistId(Long artistId) {
-        this.artistId = artistId;
+    public void setArtist(Artist artist) {
+        this.artist = artist;
     }
 }

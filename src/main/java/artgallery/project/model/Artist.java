@@ -1,6 +1,9 @@
 package artgallery.project.model;
 
 import jakarta.persistence.*;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Artist {
@@ -12,14 +15,19 @@ public class Artist {
     private String bio;
     private String email;
 
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Artwork> artworks;
+
     // Default constructor
     public Artist() {}
 
-    public Artist(Long id, String name, String bio, String email) {
+    public Artist(Long id, String name, String bio, String email, List<Artwork> artworks) {
         this.id = id;
         this.name = name;
         this.bio = bio;
         this.email = email;
+        this.artworks = artworks;
     }
 
     // Getters and Setters
@@ -53,5 +61,13 @@ public class Artist {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Artwork> getArtworks() {
+        return artworks;
+    }
+
+    public void setArtworks(List<Artwork> artworks) {
+        this.artworks = artworks;
     }
 }
