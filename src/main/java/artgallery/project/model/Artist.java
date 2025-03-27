@@ -23,7 +23,11 @@ public class Artist {
 
     @Transient // Not mapped in DB, used for easier access
     public List<Auction> getAuctions() {
+        if (artworks == null) {
+            return List.of(); // Return an empty list if artworks is null
+        }
         return artworks.stream()
+            .filter(artwork -> artwork.getAuctions() != null)
             .flatMap(artwork -> artwork.getAuctions().stream())
             .distinct()
             .collect(Collectors.toList());
