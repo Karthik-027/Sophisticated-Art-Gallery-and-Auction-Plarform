@@ -104,9 +104,11 @@ public class ArtworkController {
     }
 
     @GetMapping("/searchByTitle")
-    public ResponseEntity<List<Artwork>> searchArtworksByTitle(@RequestParam String title) {
-        List<Artwork> artworks = artworkService.findArtworksByTitle(title);
-        return new ResponseEntity<>(artworks, HttpStatus.OK);
+    public ResponseEntity<List<Artwork>> searchArtworksByTitle(@RequestParam String title,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size) {
+    List<Artwork> artworks = artworkService.findArtworksByTitle(title, page, size);
+    return new ResponseEntity<>(artworks, HttpStatus.OK);
     }
 
     @GetMapping("/artist/{artistId}")
@@ -116,8 +118,11 @@ public class ArtworkController {
     }
 
     @GetMapping("/priceRange")
-    public ResponseEntity<List<Artwork>> getArtworksByPriceRange(@RequestParam double minPrice, @RequestParam double maxPrice) {
-        List<Artwork> artworks = artworkService.findArtworksByPriceRange(minPrice, maxPrice);
-        return new ResponseEntity<>(artworks, HttpStatus.OK);
-    }
+    public ResponseEntity<List<Artwork>> getArtworksByPriceRange(@RequestParam double minPrice,
+                                                             @RequestParam double maxPrice,
+                                                             @RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "10") int size) {
+    List<Artwork> artworks = artworkService.findArtworksByPriceRange(minPrice, maxPrice, page, size);
+    return new ResponseEntity<>(artworks, HttpStatus.OK);
+}
 }

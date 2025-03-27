@@ -3,11 +3,13 @@ package artgallery.project.service;
 import artgallery.project.model.Artwork;
 import artgallery.project.model.Artist;
 import artgallery.project.repository.ArtworkRepository;
+import jakarta.transaction.Transactional;
 import artgallery.project.repository.ArtistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,7 @@ public class ArtworkService {
     }
 
     // Create or update artwork with artist mapping
+    @Transactional
     public Artwork createOrUpdateArtwork(Artwork artwork) {
         if (artwork.getArtist() == null || artwork.getArtist().getId() == null) {
             throw new IllegalArgumentException("Artist ID cannot be null");
@@ -114,23 +117,26 @@ public class ArtworkService {
     }
 
     // Find artworks by title
-    public List<Artwork> findArtworksByTitle(String title) {
-        return artworkRepository.findArtworksByTitle(title);
+    public List<Artwork> findArtworksByTitle(String title, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return artworkRepository.findArtworksByTitle(title, pageable);
     }
-
+    
     // Find artworks by artist
-    public List<Artwork> findArtworksByArtist(Long artistId) {
+    public List<Artwork> findArtworksByArtist(Long artistId, int page, int size) {
         Artist artist = artistRepository.findById(artistId)
                 .orElseThrow(() -> new IllegalArgumentException("Artist not found with ID: " + artistId));
-        return artworkRepository.findByArtist(artist);
+        Pageable pageable = PageRequest.of(page, size);
+        return artworkRepository.findByArtist(artist, pageable);
     }
+    
     public List<Artwork> findArtworksByArtistId(Long artistId) {
         return artworkRepository.findByArtistId(artistId);
     }
     
-
     // Find artworks by price range
-    public List<Artwork> findArtworksByPriceRange(double minPrice, double maxPrice) {
-        return artworkRepository.findArtworksByPriceRange(minPrice, maxPrice);
+    public List<Artwork> findArtworksByPriceRange(double minPrice, double maxPrice, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return artworkRepository.findArtworksByPriceRange(minPrice, maxPrice, pageable);
     }
 }

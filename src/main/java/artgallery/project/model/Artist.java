@@ -1,9 +1,10 @@
 package artgallery.project.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.stream.Collectors;
 
 @Entity
 public class Artist {
@@ -16,8 +17,17 @@ public class Artist {
     private String email;
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("artist")
     @JsonManagedReference
-    private List<Artwork> artworks;
+    private List<Artwork> artworks; // One-to-Many with Artwork
+
+    @Transient // Not mapped in DB, used for easier access
+    public List<Auction> getAuctions() {
+        return artworks.stream()
+            .flatMap(artwork -> artwork.getAuctions().stream())
+            .distinct()
+            .collect(Collectors.toList());
+    }
 
     // Default constructor
     public Artist() {}

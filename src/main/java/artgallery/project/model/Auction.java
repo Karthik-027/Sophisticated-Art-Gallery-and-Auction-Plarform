@@ -1,9 +1,9 @@
 package artgallery.project.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Auction {
@@ -15,15 +15,19 @@ public class Auction {
     private String date;
     private String location;
 
-    // Constructor
-    public Auction() {
-    }
+    @ManyToMany(mappedBy = "auctions")
+    @JsonIgnoreProperties("auctions")
+    private List<Artwork> artworks; // Many-to-Many with Artwork
 
-    public Auction(Long id, String auctionName, String date, String location) {
+    // Default constructor
+    public Auction() {}
+
+    public Auction(Long id, String auctionName, String date, String location, List<Artwork> artworks) {
         this.id = id;
         this.auctionName = auctionName;
         this.date = date;
         this.location = location;
+        this.artworks = artworks;
     }
 
     // Getters and Setters
@@ -57,5 +61,13 @@ public class Auction {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public List<Artwork> getArtworks() {
+        return artworks;
+    }
+
+    public void setArtworks(List<Artwork> artworks) {
+        this.artworks = artworks;
     }
 }

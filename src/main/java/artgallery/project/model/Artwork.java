@@ -1,8 +1,8 @@
 package artgallery.project.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 public class Artwork {
@@ -13,21 +13,33 @@ public class Artwork {
     private String title;
     private String description;
     private double price;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artist_id", nullable = false)
     @JsonBackReference
-    private Artist artist; // Establishing the relationship with Artist
+    private Artist artist; // Many-to-One with Artist
+
+    @ManyToMany
+    @JoinTable(
+        name = "artwork_auction",
+        joinColumns = @JoinColumn(name = "artwork_id"),
+        inverseJoinColumns = @JoinColumn(name = "auction_id")
+    )
+    private List<Auction> auctions; // One-to-Many with Auction
+
+    @Version
+    private int version;
 
     // Default constructor
     public Artwork() {}
 
-    public Artwork(Long id, String title, String description, double price, Artist artist) {
+    public Artwork(Long id, String title, String description, double price, Artist artist, List<Auction> auctions) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.price = price;
         this.artist = artist;
+        this.auctions = auctions;
     }
 
     // Getters and Setters
@@ -70,4 +82,13 @@ public class Artwork {
     public void setArtist(Artist artist) {
         this.artist = artist;
     }
+
+    public List<Auction> getAuctions() {
+        return auctions;
+    }
+
+    public void setAuctions(List<Auction> auctions) {
+        this.auctions = auctions;
+    }
 }
+ 
